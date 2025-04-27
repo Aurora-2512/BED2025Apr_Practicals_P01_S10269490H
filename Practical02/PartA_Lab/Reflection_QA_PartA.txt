@@ -1,0 +1,25 @@
+1.What did you learn about REST APIs?
+
+I gain better understanding of how the REST APIs work across the different systems by using HTTTP methods like GET, POST, Put, and Delete. 
+
+2.How did you understand the use of HTTP methods (GET, POST, PUT, DELETE)?
+
+GET is used to fetch the data.
+POST is used to create new data or resources.
+PUT is used to update or modify the existing data.
+DELETE is to delete data.
+All of these methods allow the structureed and consistent interactions with the server.
+
+3.Did you face any challenges while building the CRUD operations?
+
+Yes,especially in erorr handling because even a typo can brought up error while using GET, PUT and DELETE. For POST, the data we want to upload need to be in correct format to be post on system. If not it will show the errors.
+--------------------------------------------------------------------------------------------------
+
+a.Why use POST for creating resources and PUT for updating?
+POST is used for creating resources because it is designed to upload new data to the server which already known to add new items to databases. Server will also auto generate the unique identifier for each data.
+PUT is designed for updating resources that already existed. Server will detect the specific URLs for PUT request and update the changes of a resource with new one.
+
+
+b.What status code should be returned when attempting to update a non-existent resource?
+
+404(Not Found)
