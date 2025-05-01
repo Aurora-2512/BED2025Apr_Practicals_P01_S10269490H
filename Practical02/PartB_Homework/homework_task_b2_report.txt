@@ -1,0 +1,42 @@
+app.use(express.json())
+
+This is the middleware in Express.js that allows the server to automatically parse incoming JSON data in the HTTP requests.
+For example, when the user use POST and PUT request, it often needs to provide JSON data like {"name": "Apple", "calories": 95}.By default, Express doesn't parse the body but 
+with app.use(express.json()), it tells Express that "if the incoming request has a Content-Type: application/json, automaticallyparse the JSON and make it avaliable as a JavaScript object on req.body."
+
+req.body
+
+It represents the body of the HTTP request, and it contains data sent by the client, usually in JSON format. It mostly used in POST and PUT requests to send new or updated information to the server. It 
+
+req.query
+
+req.query is an object in Express.js that contains the query parameters sent in the URL of an HTTP request. It mostly used in GET requests.
+-used to filter or refine data requested from the server without changing the URL structure.
+example- http://localhost:3000/foods?name=Apple
+
+
+req.params.id
+
+This is used to access route parameters in a URL.
+It is used to access, update or deleter a specific item by its unique identifier (like an ID).
+
+//HTTPs method
+POST (Create)
+-is used to create data to the server 
+
+GET (Read)
+-is used to retrieves data (fetch a list or a specific item) that represent R in CRUD.
+
+PUT (Update)
+-is used to update the existinng data in the server with new informations
+
+DELETE (Delete)
+-is used to remove data from server
+
+
+//HTTP Status Codes
+200 OK: The request was successful and the server returned the requested data or confirmation.
+201 created: a new resource was successfully created
+400 Bad Request: the request was missing some informations or not incorrect format.
+404 Not Found: the requested resource could not be found or invalid data in the server.
+500 Internal Server Error: a generic error indicating the server encountered an unexpected condition or bug
