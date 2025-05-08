@@ -33,18 +33,18 @@ process.on("SIGINT", async () => {
 
 // --- GET Routes  ---
 
-// GET all books
-app.get("/books", async (req, res) => {
+// GET all students
+app.get("/students", async (req, res) => {
     let connection; // Declare connection outside try for finally block
     try {
       connection = await sql.connect(dbConfig); // Get the database connection
-      const sqlQuery = `SELECT id, title, author FROM Books`; // Select specific columns
+      const sqlQuery = `SELECT * FROM Students`; // Select specific columns
       const request = connection.request();
       const result = await request.query(sqlQuery);
       res.json(result.recordset); // Send the result as JSON
     } catch (error) {
-      console.error("Error in GET /books:", error);
-      res.status(500).send("Error retrieving books"); // Send a 500 error on failure
+      console.error("Error in GET /students:", error);
+      res.status(500).send("Error retrieving students"); // Send a 500 error on failure
     } finally {
       if (connection) {
         try {
@@ -57,24 +57,24 @@ app.get("/books", async (req, res) => {
   });
   
   // GET book by ID
-  app.get("/books/:id", async (req, res) => {
+  app.get("/students/:id", async (req, res) => {
     const bookId = parseInt(req.params.id);
     if (isNaN(bookId)) {
-      return res.status(400).send("Invalid book ID");
+      return res.status(400).send("Invalid student ID");
     }
   
     let connection;
     try {
       connection = await sql.connect(dbConfig); // Get the database connection
-      const sqlQuery = `SELECT id, title, author FROM Books WHERE id = @id`;
+      const sqlQuery = `SELECT * FROM Students WHERE student_id = @id`;
       const request = connection.request();
-      request.input("id", bookId); // Bind the id parameter
+      request.input("id", sql.Int, studentId); // Bind the id parameter
       const result = await request.query(sqlQuery);
   
       if (!result.recordset[0]) {
-        return res.status(404).send("Book not found");
+        return res.status(404).send("Student not found");
       }
-      res.json(result.recordset[0]); // Send the book data as JSON
+      res.json(result.recordset[0]); // Send the student data as JSON
     } catch (error) {
       console.error(`Error in GET /books/${bookId}:`, error);
       res.status(500).send("Error retrieving book");
@@ -92,36 +92,36 @@ app.get("/books", async (req, res) => {
 // --- POST Route  ---
 
 // POST create new book
-app.post("/books", async (req, res) => {
-    const newBookData = req.body; // Get new book data from request body
+app.post("/students", async (req, res) => {
+    const {name,address} = req.body; // Get new book data from request body
   
     // **WARNING:** No validation is performed here. Invalid data may cause database errors. We will implement the necessary validation in future practicals.
   
     let connection;
     try {
       connection = await sql.connect(dbConfig); // Get the database connection
-      const sqlQuery = `INSERT INTO Books (title, author) VALUES (@title, @author); SELECT SCOPE_IDENTITY() AS id;`;
+      const sqlQuery = `INSERT INTO Students (name, address) VALUES (@name, @address); SELECT SCOPE_IDENTITY() AS id;`;
       const request = connection.request();
       // Bind parameters from the request body
-      request.input("title", newBookData.title);
-      request.input("author", newBookData.author);
+      request.input("name", sql.NVarChar(100), name);
+      request.input("address", sql.NVarChar(255), address);
       const result = await request.query(sqlQuery);
   
       // Attempt to fetch the newly created book to return it
-      const newBookId = result.recordset[0].id;
+      const newId = result.recordset[0].id;
   
       // Directly fetch the new book here instead of calling a function
       // Re-using the same connection before closing it in finally
-      const getNewBookQuery = `SELECT id, title, author FROM Books WHERE id = @id`;
-      const getNewBookRequest = connection.request();
-      getNewBookRequest.input("id", newBookId);
-      const newBookResult = await getNewBookRequest.query(getNewBookQuery);
+      const getNewStudentQuery = `SELECT * FROM Students WHERE student_id = @id`;
+      const getNewStudentRequest = connection.request();
+      getNewStudentRequest.input("id", sql.Int, newId);
+      const newStudentResult = await getNewStudentRequest.query(getNewStudentQuery);
   
-      res.status(201).json(newBookResult.recordset[0]); // Send 201 Created status and the new book data
+      res.status(201).json(newStudentResult.recordset[0]); // Send 201 Created status and the new book data
     } catch (error) {
       console.error("Error in POST /books:", error);
       // Database errors due to invalid data (e.g., missing required fields) will likely be caught here
-      res.status(500).send("Error creating book");
+      res.status(500).send("Error creating student");
     } finally {
       if (connection) {
         try {
@@ -135,44 +135,40 @@ app.post("/books", async (req, res) => {
 
 // --- PUT Route  ---
 
-// PUT update new book
-app.put("/books/:id", async (req, res) => {
-  const bookId = parseInt(req.params.id); // Get book ID from URL
-  const updatedBookData = req.body; // Get updated data from request body
-
-  let connection;
-  try {
-    connection = await sql.connect(dbConfig); // Connect to database
+// PUT update new student
+app.put("/students/:id", async (req, res) => {
+    const studentId = parseInt(req.params.id);
+    const { name, address } = req.body;
+    let connection;
+    try {
+      connection = await sql.connect(dbConfig);// Connect to database
 
     const updateQuery = `
-      UPDATE Books
-      SET title = @title,
-          author = @author
-      WHERE id = @id
+      UPDATE Students SET name = @name, address = @address WHERE student_id = @id
     `;
     const updateRequest = connection.request();
-    updateRequest.input("id", sql.Int, bookId);
-    updateRequest.input("title", updatedBookData.title);
-    updateRequest.input("author", updatedBookData.author);
+    updateRequest.input("id", sql.Int, studentId);
+    updateRequest.input("name", sql.NVarChar(100), name);
+    updateRequest.input("address", sql.NVarChar(255), address);
 
     const updateResult = await updateRequest.query(updateQuery);
 
     if (updateResult.rowsAffected[0] === 0) {
       // No book was updated, possibly invalid ID
-      return res.status(404).send("Book not found");
+      return res.status(404).send("Student not found");
     }
 
     // Fetch the updated book to return it
-    const getUpdatedBookQuery = `SELECT id, title, author FROM Books WHERE id = @id`;
-    const getUpdatedBookRequest = connection.request();
-    getUpdatedBookRequest.input("id", sql.Int, bookId);
-    const updatedBookResult = await getUpdatedBookRequest.query(getUpdatedBookQuery);
+    const getUpdatedBookQuery = `SELECT * FROM Students WHERE student_id = @id`;
+    const getUpdatedStudentRequest = connection.request();
+    getUpdatedStudentRequest.input("id", sql.Int, studentId);
+    const updatedStudentResult = await getUpdatedStudentRequest.query(getUpdatedBookQuery);
 
-    res.status(200).json(updatedBookResult.recordset[0]); // Return updated book
+    res.status(200).json(updatedStudentResult.recordset[0]); // Return updated book
 
   } catch (error) {
-    console.error("Error in PUT /books/:id:", error);
-    res.status(500).send("Error updating book");
+    console.error("Error in PUT /students/:id:", error);
+    res.status(500).send("Error updating students");
   } finally {
     if (connection) {
       try {
@@ -187,32 +183,31 @@ app.put("/books/:id", async (req, res) => {
 // --- Delete Route  ---
 
 // DELETE the book
-app.delete("/books/:id", async (req, res) => {
-  const bookId = parseInt(req.params.id); // Extract book ID from URL
+app.delete("/students/:id", async (req, res) => {
+  const studentId = parseInt(req.params.id); // Extract book ID from URL
 
   let connection;
   try {
     connection = await sql.connect(dbConfig); // Acquire DB connection
 
     const deleteQuery = `
-      DELETE FROM Books
-      WHERE id = @id
+      DELETE FROM Students WHERE student_id = @id
     `;
     const deleteRequest = connection.request();
-    deleteRequest.input("id", sql.Int, bookId);
+    deleteRequest.input("id", sql.Int, studentId);
 
     const deleteResult = await deleteRequest.query(deleteQuery);
 
     if (deleteResult.rowsAffected[0] === 0) {
       // Book not found
-      return res.status(404).send("Book not found");
+      return res.status(404).send("Student not found");
     }
 
     // Deletion successful - return 204 No Content
     res.sendStatus(204);
   } catch (error) {
-    console.error("Error in DELETE /books/:id:", error);
-    res.status(500).send("Error deleting book");
+    console.error("Error in DELETE /students/:id:", error);
+    res.status(500).send("Error deleting student");
   } finally {
     if (connection) {
       try {
