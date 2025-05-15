@@ -1,0 +1,36 @@
+Task 1
+
+1. No all the program code are not mixing in one single file instead it separated the logic into three main parts:
+   Model: Handles all the database operations using SQL queries.
+   Controller: Handles HTTP request logic, receive data from hte model and send responses.
+   Routes: Only defines endpoints and links them to appropriate controllers and middleware.
+
+2. challanges - make sure each layer had only one responsibility. Updating route paths to respective reference in controller and middleware
+
+3. In MVC, adding new features is more structured:
+   I only need to add SQL query in model.
+   Handle request and response in the controller
+   Add new route in app.js
+I do not need to touch other unrelated part of the code so that I can easily trace back the errors if anything goes wrong.
+
+4. Compare to previous version, MVC is easier to read as each logicc in different layers. Furthermore, easier to make error handling and add new routes.
+
+5. SInce the code are separated, it is more cleaner, easier to detect errors and test the code. 
+
+
+Task 2
+
+1. Validation middleware
+   -Ensures only valid data reaches the database
+   -Allow users to see clear error messages.
+   e.g; { "title": "", "author": 123 } //POST
+   In this case, middleware will reject posting as title is missing and Author is not in string.
+   so that it will return error message like "Return: "Title cannot be empty, Author must be a string".
+
+2. SQL Injection happens when user input is treated as SQL code. 
+   Parameterized queries treats user input as data and not as code.
+   Prevent attackers from injecting maalicious SQL like " Drop Table Book "
+
+3. Exposing detailed server errors like stack traces or database errors can: Reveal server structure, Help attackers craft targeted attacks.
+   So in order to reduce these, it is better to logs details errors internally with ( console.error(..))
+   This prevent attackers from gathering useful info from codes.
