@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const sql = require("mssql");
 const dotenv = require("dotenv");
@@ -6,7 +7,6 @@ dotenv.config();
 
 const bookController = require("./controllers/bookController");
 const middleware=require("./middlewares/bookValidation")
-
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,6 +14,12 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
+
+// --- Serve static files from the 'public' directory ---
+// When a request comes in for a static file (like /index.html, /styles.css, /script.js),
+// Express will look for it in the 'public' folder relative to the project root.
+app.use(express.static(path.join(__dirname, "public")));
+
 
 // Routes for books
 // Link specific URL paths to the corresponding controller functions
