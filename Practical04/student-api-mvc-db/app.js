@@ -10,9 +10,11 @@ const studentValidation = require("./middlewares/studentValidation");
 const app = express();
 const port = process.env.PORT || 3000;
 
+const path = require("path");
 // Middleware to parse incoming JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 // --- STUDENT ROUTES ---
 app.get("/students", studentValidation.validateStudent,studentController.getAllStudents);
