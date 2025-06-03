@@ -6,7 +6,7 @@ dotenv.config(); // Load environment variables
 
 const studentController = require("./controllers/studentController");
 const studentValidation = require("./middlewares/studentValidation");
-
+const userController= require("./controllers/userController");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -22,6 +22,13 @@ app.get("/students/:id", studentValidation.validateStudentId, studentController.
 app.post("/students", studentValidation.validateStudent, studentController.addStudent);
 app.put("/students/:id", studentValidation.validateStudentId, studentValidation.validateStudent, studentController.updateStudent);
 app.delete("/students/:id", studentValidation.validateStudentId, studentController.deleteStudent);
+app.get("/users", userController.getAllUsers)
+app.get("/users/search",userController.searchUsers)
+app.get("/users/:id", userController.getUserById)
+app.post("/users",userController.addUser)
+app.put("/users/:id",userController.updateUser)
+app.delete("/users/:id",userController.deleteUser)
+app.get("/users/with-books", userController.getUsersWithBooks);
 
 // Start the server
 app.listen(port, async () => {

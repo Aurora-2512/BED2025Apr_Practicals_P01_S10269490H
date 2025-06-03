@@ -7,6 +7,7 @@ dotenv.config();
 
 const bookController = require("./controllers/bookController");
 const middleware=require("./middlewares/bookValidation")
+const userController = require("./controllers/userController");
 // Create Express app
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,10 +25,12 @@ app.use(express.static(path.join(__dirname, "public")));
 // Routes for books
 // Link specific URL paths to the corresponding controller functions
 app.get("/books",middleware.validateBook, bookController.getAllBooks);
+app.get("/users/with-books", userController.getUsersWithBooks);
 app.get("/books/:id",middleware.validateBookId, bookController.getBookById);
 app.post("/books",middleware.validateBook, bookController.createBook);
 app.put("/books/:id", middleware.validateBookId, middleware.validateBook, bookController.updateBook);
 app.delete("/books/:id", middleware.validateBookId, bookController.deleteBook);
+
 
 // Start server
 app.listen(port, () => {

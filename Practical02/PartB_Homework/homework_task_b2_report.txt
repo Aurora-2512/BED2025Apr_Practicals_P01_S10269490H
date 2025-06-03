@@ -6,7 +6,7 @@ with app.use(express.json()), it tells Express that "if the incoming request has
 
 req.body
 
-It represents the body of the HTTP request, and it contains data sent by the client, usually in JSON format. It mostly used in POST and PUT requests to send new or updated information to the server. It 
+It represents the body of the HTTP request, and it contains data sent by the client, usually in JSON format. It mostly used in POST and PUT requests to send new or updated information to the server. 
 
 req.query
 
@@ -15,7 +15,7 @@ req.query is an object in Express.js that contains the query parameters sent in 
 example- http://localhost:3000/foods?name=Apple
 
 
-req.params.id
+req.params.id 
 
 This is used to access route parameters in a URL.
 It is used to access, update or deleter a specific item by its unique identifier (like an ID).
